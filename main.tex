@@ -1,0 +1,166 @@
+%%
+%% ACV 2026 submission
+%% Based on the PLanQC 2025 extended-abstract template.
+%% Compile: lualatex main; bibtex main; lualatex main; lualatex main.
+%%
+\documentclass[sigplan, nonacm]{acmart}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+% \acmConference[ACV 2026]{First Workshop on Abstract and Concrete Techniques in Verification}{July 24--25, 2026}{Lisbon, Portugal}
+% \acmBooktitle{ACV 2026: First Workshop on Abstract and Concrete Techniques in Verification, July 24--25, 2026, Lisbon, Portugal}
+
+
+% Remove the permission/copyright text
+% \settopmatter{printacmref=false} % Removes the reference format block
+% \renewcommand\footnotetextcopyrightpermission[1]{}
+% \pagestyle{plain} % Removes running headers
+
+\input{theo-pkgs.tex}
+
+\begin{document}
+
+\title{Semantics and Equational Axiomatisation for Quantum Communication: Presentation Proposal}
+
+\author{Theo Wang}
+\authornote{This presentation is based on my MSc thesis \cite{wang_algebraic_2024} with Sam Staton (Oxford). }
+\email{theo.wang@spc.ox.ac.uk}
+\affiliation{%
+  \institution{University of Oxford}
+  \city{Oxford}
+  \country{United Kingdom}}
+
+\maketitle
+
+\section{Overview of the Presentation}
+
+\paragraph{What.} We systematically study the semantics of quantum programs extended with classically controlled quantum communication:  sending and receiving qubits, possibly depending on a classical measurement outcome. For example, the following is naturally expressed in imperative syntax, but not in the standard quantum circuit model.
+\begin{lstlisting}
+  p: qbit = in(); q: qbit = new(|0>); 
+  if (measure(p) == |1>) { out(q); }
+\end{lstlisting}
+The end goal would be to develop an axiomatisation of program equivalence between communicating quantum programs. 
+
+\paragraph{Why.} Quantum communication is an important programming primitive in distributive quantum computing~\cite{DQC_survey_Caleffi_2024}. Textbook quantum protocols such as teleportation \cite{Teleportation_PhysRevLett.70.1895} and BB84 \cite{BB84_BENNETT20147} already implicitly use communication primitives. Prior work already treats quantum communication within quantum process calculi~\cite{qCCS_ying2010algebraquantumprocesses,CQP_gay2004communicatingquantumprocesses,QPAlg_lalire2004processalgebraicapproachconcurrent, lqCCS_10.1145/3632885}, where communication is entangled with the additional complexity of concurrency.
+
+\paragraph{How.} We study the individual operations of quantum communication \emph{in isolation}, as algebraic effects, following the tradition of Plotkin and Power~\cite{plotkin_power_2002}. We do so along three axes, following the triangle summarised by \cref{fig:triangle}. We propose a new algebraic theory for quantum communication building on \cite{statonpopl15}, and study an operational and a denotational model of the theory. Finally, we show that denotational and operational equalities coincide.  
+
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}[scale=0.7, every node/.style={align=center, font=\footnotesize}]
+    \node (A) at (0, 1.2) {{\bfseries Algebraic theory} $\iotq$};
+    \node (B) at (-3.4, -1.2) {{\bfseries Operational semantics} \\ quantum streams};
+    \node (C) at (3.4, -1.2) {{\bfseries Denotational semantics} \\ free I/O monad on $\CPinf$};
+    \draw[->] (A) -- node[midway, above left, font=\scriptsize] {sound} (B);
+    \draw[->] (A) -- node[midway, above right, font=\scriptsize] {sound} (C);
+    \draw[<->] (B) -- node[midway, below, font=\scriptsize] {adequacy \\ + full abstraction} (C);
+  \end{tikzpicture}
+  \caption{Three semantics of quantum communication and how they relate.}
+  \label{fig:triangle}
+\end{figure}
+
+\section{Background: Axiomatising Quantum Computing}
+We already know how to build the same triangle for qubit quantum computing without communication. Our starting point is \cite{statonpopl15}'s axiomatisation for qubit quantum computing, $\quantum$, based on \textit{parameterised} algebraic theories (PAT). PATs are a generic framework for axiomatising the behaviour of computations dependending on certain resources in terms of operations and equations. Here, resources will correspond to qubits.
+
+\paragraph{Operations} $\op: \arity{p}{m_1...m_k}$ represent computations which take $p$ qubits, classically choose one of the $k$ branches, say, $i$, and return $m_i$ qubits. $\quantum$ has three operations: state preparation $\new: (0 \mid 1)$, unitary evolution $\applyU: (n \mid n)$ for each $2^n \times 2^n$ unitary $U$, and classical control $\opmeasure: (1 \mid 0, 0)$.
+
+\paragraph{Terms} generated from the operations, follow the same intuition: a term $\typing{x_1: m_1...x_k: m_k}{q_1...q_p}{c}$ takes $p$ input qubits $q_1...q_p$ and calls one of the $k$ continuations $x_1...x_k$ with the corresponding number of qubits. We can thus write for example the program 
+  \[
+  \typing{x: 1, y: 1}{q_1, q_2}{\opmeasure(q_1, x(q_2), y(q_2))}
+  \]
+  which measures a $q_1$ and continues with $x$ or $y$ with $q_2$ based on the measurement outcome. 
+\paragraph{Equations} are given in the form $\typing{\Gamma}{\Delta}{c=c'}$. $\quantum$ for example specifies effect of measuring a $\ket|0>$ qubit using the following equation:
+\[
+\typing{x: 0, y: 0}{\cdot}{\new(q. \opmeasure(q, x, y)) = x}
+\]
+
+\paragraph{Models: Denotational and Operational} \cite{statonpopl15} proceeds to define a denotational model for the $\quantum$ theory, where each term $\typing{x_1:m_1...x_k:m_k}{q_1...q_p}{c}$ is interpreted as a complete positive unital (CPU) map $$\sem{c}: \bigoplus_{i=1...k}\Mat_i(\complex) \to \Mat_p(\complex).$$ Remarkably, this model is \emph{fully complete}: every CPU map of this type is the interpretation of some term $c$, and two CPU maps are equal iff their term representation are derivably equal in the equational theory. 
+
+We can in fact give an equivalent operational model for $\quantum$. Briefly, configurations would look like $\langle \rho, c \rangle$ where $\rho$ is the program state, $c$ the running program, and where transitions $\to_p$ occur probabilistically. We can then formulate in terms of $\to_p$ an operational notion of program equivalence $\quequiv$ equivalent with denotational equality.
+
+\section{Semantics for Quantum Communication}
+We proceed to extend our language with communication primitives, and strive to recover the same triangle. 
+
+\subsection{An Algebraic Theory for Quantum Communication}
+Extending $\quantum$ with two operations: $\opin: (0 \mid 1)$ and $\opout: (1 \mid 0)$ lets us represent classically controlled communication. We can express the example program as $\typing{x: 0}{\cdot}{\opin(p. \new(q. \opmeasure(p, x, \opout(q, x))))}$. We further add equations to make $\opin$ and $\opout$ commute with every $\quantum$ operation. What we now obtain is $\iotq$, where $\otimes$ denotes the commutative combination of two theories. This choice is motivated by quantum theory. For instance,  
+$$\opmeasure(a,\; \opout(b, x),\; \opout(b, y)) = \opout(b,\; \opmeasure(a, x, y))$$
+is required to derive the equivalence between: preparing a Bell pair, sending one end and discarding the other end; and tossing a fair coin and sending the outcome as a qubit. 
+
+\subsection{An Operational Model}
+The notion of communication that our theory soundly axiomatises can be demonstrated through an operational model. Let $\CP$ be the category of finite dimensional C* algebras and complete positive maps, constructed as in \cite{selinger_dagger_compact_closed_cat_cp_maps}. 
+
+The operational semantics is based on a \emph{quantum stream}, specifying the environment our program communicates with. The idea is then to have a global quantum state $\rho: \complex \to S \otimes \qbit \otimes H$, where $S$ is the program state, $H$ is the hidden stream state, and $\qbit$ is the next input qubit. Then, a stream is a state machine reacting to the program's communications: formally, a stream is specified by a hidden state type $H_\sigma$ and transition maps $T_{\opin}(\sigma)$, $T_{\opout}(\sigma)$ for every communication trace $\sigma \in \traceset$. 
+
+We can then build an operational semantics with configuration $\config{\rho}{\sigma}{c}$, where $\rho$ is the global state, $\sigma \in \{\opin, \opout\}^*$, $c$ is the program. Given a stream specification $t$ we can give a small step transition relation $\to^t_p$ defined inductively on the program. For example for the output operation we can have:
+
+\todo{}
+
+where the output is performed, and the stream state is updated according to $t$. It is then not difficult to extend $\quequiv$ to communicating quantum programs, to obtain a sound model of $\iotq$: 
+\begin{theorem}
+  $\typing{\Gamma}{\Delta}{c=c'} \implies \typing{\Gamma}{\Delta}{c \quequiv c'}$.
+\end{theorem}
+
+\subsection{A Denotational Model}
+\paragraph{Strategy}
+\paragraph{The Quantum I/O Monad}
+\paragraph{Denotational Semantics}
+
+\section{Limitations and Future Work}
+
+We have thus obtained a sound axiomatisation of two notions of quantum communication, one operationally presented, one denotationally presented, which end up being equivalent. However, unlike the quantum computing case, we do not have completeness; it is unclear whether two programs $c$ and $c'$ being denotationally equal implies that they are derivably equal in $\iotq$. Achieving this is our immediate next step. 
+
+\section{Background: parameterised algebraic theories and QUANTUM}
+
+A parameterised algebraic theory (PAT)~\cite{statonpopl15} is a signature of operations together with equations over their terms, whose operations carry \emph{linear parameter contexts}: a typing judgement $\typing{\Gamma}{\Delta}{c}$ has $\Delta$ a list of parameter names (here, qubits) and $\Gamma$ a list of continuation variables with their valences. Operations $\op:\arity{p}{m_1\dots m_k}$ consume $p$ parameters and bind $m_i$ fresh parameters in each of $k$ continuations. Read as a type discipline, this is a linear type system for resource-sensitive effects.
+
+Two combinators are standard: the \emph{sum} (the free combination, no equations imposed between the two signatures) and the \emph{tensor} (which adds the equation that every operation of one theory commutes with every operation of the other). Their constructions for the PATs of~\cite{statonpopl15} are worked out in~\cite{wang_algebraic_2024}.
+
+Staton's $\quantum$~\cite{statonpopl15} is a PAT for qubit quantum computation with operations $\new:\arity{0}{1}$ (state preparation), $\applyU:\arity{n}{n}$ (unitary evolution) and $\opmeasure:\arity{1}{0,0}$ (computational-basis measurement with classical control), together with quantum-theoretic equations such as the principle of deferred measurement. It is sound and complete with respect to its standard operator-algebra interpretation in $\CP$, the finite-biproduct completion of the category $\CPM$ of matrix algebras and CP maps. The analogous picture to Figure~\ref{fig:triangle} is settled in this I/O-free case. We extend it to communication.
+
+\section{The algebraic theory for I/O and QUANTUM}
+
+Extending $\quantum$ with $\opin:\arity{0}{1}$ (receive a qubit) and $\opout:\arity{1}{0}$ (send a qubit) lets us write classically controlled communication directly. The theory $\iotq$ is the \emph{tensor} (not sum) of $\quantum$ with a standard $\io$ theory~\cite{sums_tensors_HYLAND200670}. There are two design points. First, $\opin$ and $\opout$ do not commute with each other --- the order of I/O events is part of the observable behaviour of a program. Second, $\opin$ and $\opout$ do commute with all of $\quantum$'s operations; this is motivated by quantum theory, since for instance
+$$\opmeasure(a,\; \opout(b, x),\; \opout(b, y)) = \opout(b,\; \opmeasure(a, x, y))$$
+is needed to make a familiar quantum equivalence --- preparing a Bell pair, sending one qubit and discarding the other equals tossing a fair coin and preparing the outcome --- provable in the theory~(\cite{wang_algebraic_2024}, eq.~4.1.4). Tensors of theories can collapse (the Eckmann--Hilton argument for unital binary operations is the textbook example); whether $\iotq$ collapses is ruled out \emph{a posteriori} by the two models in \S\S4--5.
+
+\section{Operational semantics: quantum streams}
+
+A \emph{quantum stream} is a $\traceset$-indexed family $q:\traceset \to \Ob\CP$ together with CPTP transitions $T(\sigma,\opin)$ and $T(\sigma,\opout)$ that update a hidden environment state at each I/O event. Streams are coalgebraic in flavour; we comment on a coalgebraic recasting in \S7. A configuration $\config{\rho}{\sigma}{c}$ pairs a normalised global state $\rho$ (over program qubits, communication qubit, and hidden state), an I/O trace $\sigma$, and a program $c$. The small-step probabilistic transition $\to^t_p$ is defined inductively in the program structure: measurement reduces probabilistically; other operations reduce deterministically; a continuation call terminates.
+
+The induced \emph{quantum equivalence} $c_1 \quequiv c_2$ holds when, for every stream and every initial state, the two programs yield the same probability-weighted distribution over (final state, continuation called, final I/O trace) triples. Terms of $\iotq$ modulo $\quequiv$ form a model of $\iotq$~(\cite{wang_algebraic_2024}, Thm.~4.3.25): the equations of the PAT are validated by the stream dynamics.
+
+\section{Denotational semantics: a free I/O monad}
+
+The operational semantics lives in $\CP$, which has only finite biproducts; the denotational sum over all I/O traces below needs infinitely many. Following~\cite{PaganiSV13}, $\CPinf$ is the infinite-biproduct, dcpo-enriched completion of $\CPM$, inheriting compact closure from $\CPM$. On $\CPinf$ we define
+$$
+  T(X) \;\eqdef\; \mu Y.\; \bigl(\qbitin \otimes Y\bigr) \oplus \bigl(\qbitout \otimes Y\bigr) \oplus X \;\;\cong\;\; \bigoplus_{\sigma \in \traceset} \Aux(\sigma) \otimes X,
+$$
+where $\Aux(\epsilon)=\complex$ and, for $s\in\{\opin,\opout\}$, $\Aux(s\!\cdot\!\sigma)=\qbit^{s}\otimes\Aux(\sigma)$; the superscripts $\opin/\opout$ are bookkeeping, both $\qbitin$ and $\qbitout$ are just $\qbit$. For every I/O trace $\sigma$, the corresponding summand tensors the qubits exchanged along $\sigma$ with a value of type $X$.
+
+The input case deserves a comment. An input operation morally has type $\qbit\!\multimap\!Y$. Compact closure of $\CPinf$ gives $\qbit\!\multimap\!Y \cong \qbit^{*}\otimes Y$, and the further fact that $\qbit$ is self-dual in $\CPM$ gives $\qbit^{*}\cong\qbit$, so the input summand can be written as $\qbitin \otimes Y$. The two readings are reconciled by a single string-diagrammatic move: the unnormalised maximally entangled state acts as a cup, bending the input wire.
+
+Interpreting parameter contexts as tensor powers of $\qbit$ and continuation contexts as direct sums, each term $\typing{\Gamma}{\Delta}{c}$ denotes a Kleisli morphism
+$$\sem{c} \;:\; \sem{\Delta} \longrightarrow T\sem{\Gamma} \;\cong\; \bigoplus_{\sigma \in \traceset,\; (x:n) \in \Gamma} \Aux(\sigma) \otimes \qbitn{n},$$
+a family of CP maps indexed by (final I/O trace, continuation called) --- the same indexing already used by $\quequiv$. The object $\complex$ is a model of $\iotq$ in $\Kl{T}^{\mathrm{op}}$~(\cite{wang_algebraic_2024}, Cor.~5.4.2).
+
+\section{Adequacy and full abstraction}
+
+The two concrete models coincide on program equivalence.
+\begin{theorem}[\cite{wang_algebraic_2024}, Thm.~5.3.4 (adequacy) and Thm.~5.3.6 (full abstraction)]\label{thm:adequacyfullabs}
+  For all $\typing{\Gamma}{\Delta}{c_1, c_2}$:\quad
+  $\sem{c_1}=\sem{c_2}$\quad iff\quad $c_1 \quequiv c_2$.
+\end{theorem}
+This is the kind of abstract--concrete correspondence the workshop addresses: both sides are independent concrete techniques, and Theorem~\ref{thm:adequacyfullabs} shows they agree, with the abstract theory $\iotq$ as the common interface that each refines. The proof goes via a \emph{sum-of-paths} characterisation matching the operational sum over reduction sequences to the categorical sum over biproduct components, term by term. The matching of Theorem~\ref{thm:adequacyfullabs} does not, however, settle \emph{completeness} of $\iotq$: whether the equational theory derives every identification validated by the two concrete models is open~(\cite{wang_algebraic_2024}, Conjecture~5.4.4).
+
+\section{Discussion and open directions}
+
+The pattern \emph{algebraic theory + two concrete models + adequacy/FA} echoes themes in the algebraic-effects programme of Plotkin and Power~\cite{plotkin_power_2002} and is instantiated, for $\quantum$ alone, in~\cite{statonpopl15}. The quantum I/O case is technically non-trivial because compact closure, infinite biproducts, and the possibility of a tensor-of-theories collapse each constrain the construction.
+
+We would welcome discussion at the workshop on three open directions. \emph{(a)} \textbf{Completeness} of $\iotq$ for $\quequiv$: what would a suitable axiomatic logic look like for a matching like Theorem~\ref{thm:adequacyfullabs}? \emph{(b)} \textbf{Coalgebraic reading.} The stream of \S4 is coalgebraic, and Ceragioli et al.'s coalgebraic model of quantum bisimulation~\cite{ceragiolicoalgebraic} appears to provide a coalgebraic framing of related phenomena; we are also curious how our denotational semantics relates to the $\mathsf{Caus}$ construction of Kissinger--Uijlen~\cite{kissinger2019categorical}. \emph{(c)} \textbf{Algorithmic verification.} The denotational semantics is probabilistic and indexed by I/O traces; is there a decidable fragment, or a probabilistic / quantum Hennessy--Milner logic against which equivalence in $\iotq$ could be model-checked?
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+\end{document}

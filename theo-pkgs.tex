@@ -1,0 +1,318 @@
+% MY OWN THINGS
+
+% \usepackage{amsmath,amssymb,amsthm}
+% \usepackage{amsthm}
+% \usepackage[margin=2cm]{geometry}
+\usepackage{dsfont}
+\usepackage{tikz}
+\usetikzlibrary{cd}
+\usetikzlibrary{babel}
+% \usepackage{tikz-cd}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{parskip}
+\usepackage{ebproof}
+% \usepackage{quiver}
+\usepackage{stackengine,scalerel}
+% \usepackage{xparse}
+% \usepackage{physics}
+\usepackage{physics2}
+\usephysicsmodule{ab,ab.braket}
+\usepackage{tikzit}
+\input{smc.tikzstyles}
+
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+
+% \usepackage{unicode-math}
+% \setromanfont{TeX Gyre Termes}
+% \setsansfont{TeX Gyre Heros}
+% \setmonofont{TeX Gyre Cursor}[Ligatures=NoCommon]
+% \setmathfont{TeX Gyre Termes Math}
+
+% \usepackage{luatexja}
+
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape,
+  language=Python,
+  morekeywords={qbit, bit, out, in, new, measure, apply, skip}
+}
+
+% \usepackage{quantikz}
+
+
+%% Theorems
+\theoremstyle{plain} % default
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{convention}[theorem]{Convention}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{nonexample}[theorem]{Non-Example}
+
+
+
+
+%% Probability
+\makeatletter
+\renewcommand{\P}{%
+	\@ifnextchar\bgroup%
+	{\@Pwithargs}
+	{\@Pnoargs}
+}
+\newcommand{\@Pwithargs}[1]{%
+	\@ifnextchar\bgroup%
+	{\@Ptwoargs{#1}}
+	{\@Ponearg{#1}}
+}
+\newcommand{\@Pnoargs}{\mathbb{P}}
+\newcommand{\@Ponearg}[1]{\mathbb{P}\left[ #1 \right]}
+\newcommand{\@Ptwoargs}[2]{\mathbb{P}_{#1}\left[ #2 \right]}
+\newcommand{\E}{%
+	\@ifnextchar\bgroup%
+	{\@Ewithargs}
+	{\@Enoargs}
+}
+\newcommand{\@Ewithargs}[1]{%
+	\@ifnextchar\bgroup%
+	{\@Etwoargs{#1}}
+	{\@Eonearg{#1}}
+}
+\newcommand{\@Enoargs}{\mathbb{E}}
+\newcommand{\@Eonearg}[1]{\mathbb{E}\left[ #1 \right]}
+\newcommand{\@Etwoargs}[2]{\underset{#1}{\mathbb{E}}\left[ #2 \right]}
+\makeatother
+
+%% MACROS
+\newcommand{\naturals}{\mathbb{N}}
+\newcommand{\integers}{\mathbb{Z}}
+\newcommand{\indicator}{\mathds{1}}
+\newcommand{\va}{\mathbf{a}}
+\newcommand{\vb}{\mathbf{b}}
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\vy}{\mathbf{y}}
+\newcommand{\vw}{\mathbf{w}}
+\newcommand{\vz}{\mathbf{z}}
+\newcommand{\vsigma}{\mathbf{\sigma}}
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\complex}{\mathbb{C}}
+\newcommand{\field}{\mathbb{F}}
+\newcommand{\sign}{\mathrm{sign}}
+\newcommand{\lnorm}[2]{\Vert #1 \Vert_{#2}}
+\newcommand{\ltwonorm}[1]{\lnorm{#1}{2}}
+\newcommand{\grad}{\nabla}
+\newcommand{\LinW}{\mathsf{Lin}_W}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calW}{\mathcal{W}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\PARTITION}{\mathsf{PARTITION}}
+\newcommand{\NULLPLAYER}{\mathsf{NULLPLAYER}}
+\newcommand{\KNAPSACK}{\mathsf{KNAPSACK}}
+\newcommand{\Core}{\mathbf{Core}}
+\newcommand{\ve}{\mathbf{e}}
+\newcommand{\vzero}{\mathbf{0}}
+\newcommand{\true}{\mathsf{true}}
+\newcommand{\false}{\mathsf{false}}
+\newcommand{\err}{\mathrm{err}}
+\newcommand{\brackets}[1]{\{#1\}}
+\newcommand{\polyinput}{\text{poly}(\text{input})}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\Rcal}{\mathcal{R}}
+% changed here
+\newcommand{\TTop}{\mathcal{T}}
+% end changed here
+\newcommand{\WinningSet}[1]{\Ecal(C, n, \Rcal, #1)}
+\newcommand{\WinningSetR}[2]{\Ecal(C, n, #1, #2)}
+\newcommand{\wsonea}{\Ecal(C, n, R_1, a)}
+\newcommand{\Wsp}{\Ecal^{sp}_n}
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
+
+\newcommand{\bicatb}{\mathcal{B}}
+
+\newcommand{\catc}{\mathcal{C}}
+\newcommand{\catcop}{\catc^{op}}
+\newcommand{\catd}{\mathcal{D}}
+\newcommand{\cate}{\mathcal{E}}
+\newcommand{\eqdef}{\triangleq}
+\newcommand{\id}{\mathbf{id}}
+\newcommand{\idbicat}{\mathbf{Id}}
+\newcommand{\Id}{\mathbf{Id}}
+\newcommand{\righttop}[1]{\xrightarrow{#1}}
+\newcommand{\lefttop}[1]{\xleftarrow{#1}}
+\newcommand{\Ob}{\mathbf{Ob} \ }
+\newcommand{\Set}{\mathbf{Set}}
+\newcommand{\SpanC}{\mathbf{Span(\catc)}}
+\newcommand{\SpanSet}{\mathbf{Span(Set)}}
+\newcommand{\Cat}{\mathbf{Cat}}
+\newcommand{\SetMC}{\Set^\times}
+\newcommand{\spancat}[5]{#1 \lefttop{#2} #3 \righttop{#4} #5}
+\newcommand{\cospancat}[5]{#1 \righttop{#2} #3\lefttop{#4} #5}
+\newcommand{\pb}[5]{#1 \times_{#2#3#4} #5}
+\newcommand{\pbs}[3]{#1 \times_{#2} #3}
+\newcommand{\pbup}[3]{\langle #1, #2 \rangle_{#3}}
+\newcommand{\pbm}[3]{#1\times_{#2}#3}
+% \newcommand{\Tree}{\mathcal{T}}
+\newcommand{\npbup}[2]{\langle #1 \rangle_{#2}}
+\newcommand{\npbuptmp}[1]{\llbracket #1 \rrbracket}
+\newcommand{\Scal}{\mathcal{S}}
+\newcommand{\CtxZero}{\mathbf{Ctx_0}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Fop}{\mathbb{F}^{op}}
+\newcommand{\CtxOne}{\mathbf{Ctx_1}}
+\newcommand{\LT}{\mathbb{L}}
+\newcommand{\catv}{\mathcal{V}}
+\newcommand{\struct}{\mathbf{struct}}
+\newcommand{\arity}[2]{( #1 \ | \ #2)}
+\newcommand{\FinProd}{\mathsf{FinProd}}
+\newcommand{\D}{\mathsf{D}}
+% \newcommand{\yo}{\textmc{よ}}
+\newcommand{\yo}{\textbf{yo}}
+\newcommand{\Bij}{\mathbf{Bij}}
+\newcommand{\Inj}{\mathbf{Inj}}
+\newcommand{\FinSet}{\mathbf{FinSet}}
+\newcommand{\BijSystem}{\mathsf{Bij}}
+\newcommand{\InjSystem}{\mathsf{Inj}}
+\newcommand{\CartSystem}{\mathsf{Cart}}
+\newcommand{\dayconv}{\otimes_{\text{Day}}}
+\newcommand{\Law}{\mathbf{Law}}
+\newcommand{\LawEnriched}{\mathbf{Law}^{\text{enr}}}
+
+\newcommand{\terminalmorph}{\langle\rangle}
+\newcommand{\prodmorph}[2]{\langle#1, #2\rangle}
+
+% \newcommand{\ul}[1]{\underline{#1}}
+\newcommand{\yozero}{\yo(0)}
+\newcommand{\yoone}{\yo(1)}
+\newcommand{\yon}{\yo(n)}
+\newcommand{\yom}{\yo({m})}
+\newcommand{\yop}{\yo(p)}
+\newcommand{\op}{\mathbf{op}}
+\newcommand{\Ops}{\mathcal{O}}
+\newcommand{\typing}[3]{#1 \ | \ #2 \vdash #3}
+\newcommand{\typingfilled}[1]{\Gamma \ | \ \Delta \vdash #1}
+% \newcommand\eye{\ensurestackMath{\stackinset{c}{}{c}{-.33pt}%
+%   {\bullet}{\bigcirc}}}
+% \newcommand\smallereye{\scalerel*{\eye}{x}}
+% \newcommand{\eyemid}{ \ \eye \ }
+\newcommand{\eye}{\odot}
+\newcommand{\eyemid}{\odot}
+\newcommand{\sem}[1]{\llbracket#1\rrbracket}
+\newcommand{\metasub}[2]{\{#1/#2\}}
+\newcommand{\inl}{\mathbf{inl}}
+\newcommand{\inr}{\mathbf{inr}}
+
+% I/O Quantum things
+\newcommand{\quantum}{\mathsf{Quantum}}
+\newcommand{\io}{\mathsf{I/O}}
+\newcommand{\iotq}{\io \otimes \quantum}
+
+% Useful Categories
+\newcommand{\CPU}{\mathbf{CPU}}
+\newcommand{\CPTP}{\mathbf{CPTP}}
+\newcommand{\CP}{\mathbf{CP}}
+
+% Operations
+\newcommand{\new}{\mathsf{new}}
+\newcommand{\apply}{\mathsf{apply}}
+\newcommand{\applyU}{\mathsf{apply}_U}
+% \newcommand{\measure}{\mathsf{measure}}
+\newcommand{\opmeasure}{\mathsf{measure}}
+\newcommand{\discard}{\mathsf{discard}}
+
+% I/O operations
+\newcommand{\opin}{\mathsf{in}}
+\newcommand{\opout}{\mathsf{out}}
+\newcommand{\opcin}{\mathsf{cin}}
+\newcommand{\opcout}{\mathsf{cout}}
+\newcommand{\opskip}{\mathsf{skip}}
+
+% Vectors
+\newcommand{\veca}{\Vec{a}}
+\newcommand{\vecb}{\Vec{b}}
+\newcommand{\vecc}{\Vec{c}}
+\newcommand{\vecd}{\Vec{d}}
+\newcommand{\vecx}{\Vec{x}}
+\newcommand{\vecy}{\Vec{y}}
+\newcommand{\vecz}{\Vec{z}}
+\newcommand{\vecp}{\Vec{p}}
+\newcommand{\vecq}{\Vec{q}}
+
+
+\newcommand{\statein}{\mathbf{in}}
+\newcommand{\traceset}{\{\opin, \opout\}^*}
+\newcommand{\Stream}{\mathsf{Stream}}
+
+\newcommand{\Mat}{\mathcal{M}}
+\newcommand{\qubit}{\Mat_2(\complex)}
+\newcommand{\MnC}{\Mat_n(\complex)}
+\newcommand{\MkC}{\Mat_k(\complex)}
+\newcommand{\MtnC}{\Mat_{2^n}(\complex)}
+
+\newcommand{\qbit}{\mathbf{qbit}}
+\newcommand{\qbitn}[1]{\qbit^{\otimes #1}}
+\newcommand{\bit}{\mathbf{bit}}
+
+\newcommand{\rhotilde}{\tilde{\rho}}
+\newcommand{\psitilde}{\tilde{\psi}}
+\newcommand{\Config}{\mathbf{Config}}
+\newcommand{\Dist}{\mathcal{D}}
+\newcommand{\config}[3]{\left\langle #1, #2, #3 \right\rangle}
+\newcommand{\trace}{\mathbf{tr}}
+\newcommand{\unifiedconfig}[3]{\left[ #1, #2, #3 \right]}
+
+\newcommand{\probred}[2]{\downarrow_{#2}^{#1}}
+\newcommand{\probredp}[1]{\downarrow_{#1}^{t}}
+\newcommand{\probredfilled}{\downarrow_{p}^{t}}
+\newcommand{\probequiv}{\simeq_{\text{pr}}}
+\newcommand{\psequiv}{\simeq_{pr}^{\opskip}}
+
+
+\newcommand{\qured}[3]{\Downarrow_{#3}^{#1, #2}}
+\newcommand{\quredp}[1]{\Downarrow_{#1}^{\Gamma, t}}
+\newcommand{\quredfilled}{\Downarrow_{p}^{\Gamma, t}}
+\newcommand{\quequiv}{\simeq_{qu}}
+
+\newcommand{\alphaequiv}{\simeq_\alpha}
+
+\newcommand{\phibar}{\bar{\phi}}
+\newcommand{\tostar}{\to^*}
+
+\newcommand{\LHS}{\mathsf{LHS}}
+\newcommand{\RHS}{\mathsf{RHS}}
+
+\newcommand{\Path}[1]{\mathsf{Path}\left(#1\right)}
+
+% Chapter 2 algebraic theories
+\newcommand{\Mon}{\mathsf{Mon}}
+
+\newcommand{\Tree}{\mathsf{Tree}}
+
+\newcommand{\return}[1]{\mathbf{return} \ #1}
+\newcommand{\Kl}[1]{\mathsf{Kl}_{#1}}
+
+% chapter 5
+\newcommand{\CPinf}{\CP^\infty}
+\newcommand{\Mod}{\mathsf{Mod}}
+\newcommand{\Aux}{\mathsf{Aux}}
+\newcommand{\qbitin}{\qbit^{\opin}}
+\newcommand{\qbitout}{\qbit^{\opout}}
+\newcommand{\CPM}{\mathbf{CPM}}
+\newcommand{\CPMbar}{\overline{\CPM}}
+\newcommand{\geqlowner}{\sqsupseteq}
+\newcommand{\leqlowner}{\sqsubseteq}
+\newcommand{\lub}{\bigsqcup}
+\newcommand{\inj}{\mathsf{inj}}
+\newcommand{\projsf}{\mathsf{proj}}
+\newcommand{\Run}{\mathsf{Run}}
+\newcommand{\Connect}{\mathsf{Connect}}
+
+\newcommand{\ICal}{\mathcal{I}}
