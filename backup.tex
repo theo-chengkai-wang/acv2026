@@ -1,0 +1,48 @@
+\section{Background: parameterised algebraic theories and QUANTUM}
+
+A parameterised algebraic theory (PAT)~\cite{statonpopl15} is a signature of operations together with equations over their terms, whose operations carry \emph{linear parameter contexts}: a typing judgement $\typing{\Gamma}{\Delta}{c}$ has $\Delta$ a list of parameter names (here, qubits) and $\Gamma$ a list of continuation variables with their valences. Operations $\op:\arity{p}{m_1\dots m_k}$ consume $p$ parameters and bind $m_i$ fresh parameters in each of $k$ continuations. Read as a type discipline, this is a linear type system for resource-sensitive effects.
+
+Two combinators are standard: the \emph{sum} (the free combination, no equations imposed between the two signatures) and the \emph{tensor} (which adds the equation that every operation of one theory commutes with every operation of the other). Their constructions for the PATs of~\cite{statonpopl15} are worked out in~\cite{wang_algebraic_2024}.
+
+Staton's $\quantum$~\cite{statonpopl15} is a PAT for qubit quantum computation with operations $\new:\arity{0}{1}$ (state preparation), $\applyU:\arity{n}{n}$ (unitary evolution) and $\opmeasure:\arity{1}{0,0}$ (computational-basis measurement with classical control), together with quantum-theoretic equations such as the principle of deferred measurement. It is sound and complete with respect to its standard operator-algebra interpretation in $\CP$, the finite-biproduct completion of the category $\CPM$ of matrix algebras and CP maps. The analogous picture to Figure~\ref{fig:triangle} is settled in this I/O-free case. We extend it to communication.
+
+\section{The algebraic theory for I/O and QUANTUM}
+
+Extending $\quantum$ with $\opin:\arity{0}{1}$ (receive a qubit) and $\opout:\arity{1}{0}$ (send a qubit) lets us write classically controlled communication directly. The theory $\iotq$ is the \emph{tensor} (not sum) of $\quantum$ with a standard $\io$ theory~\cite{sums_tensors_HYLAND200670}. There are two design points. First, $\opin$ and $\opout$ do not commute with each other --- the order of I/O events is part of the observable behaviour of a program. Second, $\opin$ and $\opout$ do commute with all of $\quantum$'s operations; this is motivated by quantum theory, since for instance
+$$\opmeasure(a,\; \opout(b, x),\; \opout(b, y)) = \opout(b,\; \opmeasure(a, x, y))$$
+is needed to make a familiar quantum equivalence --- preparing a Bell pair, sending one qubit and discarding the other equals tossing a fair coin and preparing the outcome --- provable in the theory~(\cite{wang_algebraic_2024}, eq.~4.1.4). Tensors of theories can collapse (the Eckmann--Hilton argument for unital binary operations is the textbook example); whether $\iotq$ collapses is ruled out \emph{a posteriori} by the two models in \S\S4--5.
+
+\section{Operational semantics: quantum streams}
+
+A \emph{quantum stream} is a $\traceset$-indexed family $q:\traceset \to \Ob\CP$ together with CPTP transitions $T(\sigma,\opin)$ and $T(\sigma,\opout)$ that update a hidden environment state at each I/O event. Streams are coalgebraic in flavour; we comment on a coalgebraic recasting in \S7. A configuration $\config{\rho}{\sigma}{c}$ pairs a normalised global state $\rho$ (over program qubits, communication qubit, and hidden state), an I/O trace $\sigma$, and a program $c$. The small-step probabilistic transition $\to^t_p$ is defined inductively in the program structure: measurement reduces probabilistically; other operations reduce deterministically; a continuation call terminates.
+
+The induced \emph{quantum equivalence} $c_1 \quequiv c_2$ holds when, for every stream and every initial state, the two programs yield the same probability-weighted distribution over (final state, continuation called, final I/O trace) triples. Terms of $\iotq$ modulo $\quequiv$ form a model of $\iotq$~(\cite{wang_algebraic_2024}, Thm.~4.3.25): the equations of the PAT are validated by the stream dynamics.
+
+\section{Denotational semantics: a free I/O monad}
+
+The operational semantics lives in $\CP$, which has only finite biproducts; the denotational sum over all I/O traces below needs infinitely many. Following~\cite{PaganiSV13}, $\CPinf$ is the infinite-biproduct, dcpo-enriched completion of $\CPM$, inheriting compact closure from $\CPM$. On $\CPinf$ we define
+$$
+  T(X) \;\eqdef\; \mu Y.\; \bigl(\qbitin \otimes Y\bigr) \oplus \bigl(\qbitout \otimes Y\bigr) \oplus X \;\;\cong\;\; \bigoplus_{\sigma \in \traceset} \Aux(\sigma) \otimes X,
+$$
+where $\Aux(\epsilon)=\complex$ and, for $s\in\{\opin,\opout\}$, $\Aux(s\!\cdot\!\sigma)=\qbit^{s}\otimes\Aux(\sigma)$; the superscripts $\opin/\opout$ are bookkeeping, both $\qbitin$ and $\qbitout$ are just $\qbit$. For every I/O trace $\sigma$, the corresponding summand tensors the qubits exchanged along $\sigma$ with a value of type $X$.
+
+The input case deserves a comment. An input operation morally has type $\qbit\!\multimap\!Y$. Compact closure of $\CPinf$ gives $\qbit\!\multimap\!Y \cong \qbit^{*}\otimes Y$, and the further fact that $\qbit$ is self-dual in $\CPM$ gives $\qbit^{*}\cong\qbit$, so the input summand can be written as $\qbitin \otimes Y$. The two readings are reconciled by a single string-diagrammatic move: the unnormalised maximally entangled state acts as a cup, bending the input wire.
+
+Interpreting parameter contexts as tensor powers of $\qbit$ and continuation contexts as direct sums, each term $\typing{\Gamma}{\Delta}{c}$ denotes a Kleisli morphism
+$$\sem{c} \;:\; \sem{\Delta} \longrightarrow T\sem{\Gamma} \;\cong\; \bigoplus_{\sigma \in \traceset,\; (x:n) \in \Gamma} \Aux(\sigma) \otimes \qbitn{n},$$
+a family of CP maps indexed by (final I/O trace, continuation called) --- the same indexing already used by $\quequiv$. The object $\complex$ is a model of $\iotq$ in $\Kl{T}^{\mathrm{op}}$~(\cite{wang_algebraic_2024}, Cor.~5.4.2).
+
+\section{Adequacy and full abstraction}
+
+The two concrete models coincide on program equivalence.
+\begin{theorem}[\cite{wang_algebraic_2024}, Thm.~5.3.4 (adequacy) and Thm.~5.3.6 (full abstraction)]\label{thm:adequacyfullabs}
+  For all $\typing{\Gamma}{\Delta}{c_1, c_2}$:\quad
+  $\sem{c_1}=\sem{c_2}$\quad iff\quad $c_1 \quequiv c_2$.
+\end{theorem}
+This is the kind of abstract--concrete correspondence the workshop addresses: both sides are independent concrete techniques, and Theorem~\ref{thm:adequacyfullabs} shows they agree, with the abstract theory $\iotq$ as the common interface that each refines. The proof goes via a \emph{sum-of-paths} characterisation matching the operational sum over reduction sequences to the categorical sum over biproduct components, term by term. The matching of Theorem~\ref{thm:adequacyfullabs} does not, however, settle \emph{completeness} of $\iotq$: whether the equational theory derives every identification validated by the two concrete models is open~(\cite{wang_algebraic_2024}, Conjecture~5.4.4).
+
+\section{Discussion and open directions}
+
+The pattern \emph{algebraic theory + two concrete models + adequacy/FA} echoes themes in the algebraic-effects programme of Plotkin and Power~\cite{plotkin_power_2002} and is instantiated, for $\quantum$ alone, in~\cite{statonpopl15}. The quantum I/O case is technically non-trivial because compact closure, infinite biproducts, and the possibility of a tensor-of-theories collapse each constrain the construction.
+
+We would welcome discussion at the workshop on three open directions. \emph{(a)} \textbf{Completeness} of $\iotq$ for $\quequiv$: what would a suitable axiomatic logic look like for a matching like Theorem~\ref{thm:adequacyfullabs}? \emph{(b)} \textbf{Coalgebraic reading.} The stream of \S4 is coalgebraic, and Ceragioli et al.'s coalgebraic model of quantum bisimulation~\cite{ceragiolicoalgebraic} appears to provide a coalgebraic framing of related phenomena; we are also curious how our denotational semantics relates to the $\mathsf{Caus}$ construction of Kissinger--Uijlen~\cite{kissinger2019categorical}. \emph{(c)} \textbf{Algorithmic verification.} The denotational semantics is probabilistic and indexed by I/O traces; is there a decidable fragment, or a probabilistic / quantum Hennessy--Milner logic against which equivalence in $\iotq$ could be model-checked?
