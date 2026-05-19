@@ -1,0 +1,41 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=none] (0) at (0.5, 0) {};
+		\node [style=none] (1) at (2.5, -1.5) {};
+		\node [style=none] (2) at (4.5, 0) {};
+		\node [style=none] (3) at (2.5, -0.5) {$\rho$};
+		\node [style=none] (4) at (1, 0) {};
+		\node [style=none] (5) at (3.75, 0) {};
+		\node [style=none] (6) at (4.25, 0) {};
+		\node [style=none] (8) at (4.25, 5.75) {};
+		\node [style=none] (9) at (3.75, 5.75) {};
+		\node [style=none] (10) at (0.5, 0.5) {$s$};
+		\node [style=none] (11) at (3.25, 6.25) {$\mathbf{in}$};
+		\node [style=none] (12) at (4.75, 6.25) {$h$};
+		\node [style=rect small] (13) at (1, 1.5) {$\pi$};
+		\node [style=rect small] (14) at (2.75, 3) {$U$};
+		\node [style=rect small] (15) at (1, 4.75) {$\pi^{-1}$};
+		\node [style=none] (18) at (0.75, 1.75) {};
+		\node [style=none] (20) at (0.75, 4.5) {};
+		\node [style=none] (21) at (1.25, 4.5) {};
+		\node [style=none] (23) at (1.25, 1.75) {};
+		\node [style=none] (24) at (1, 5.75) {};
+		\node [style=none] (25) at (-0.75, 3.25) {$\pi''(\Delta)$};
+		\node [style=none] (26) at (2.5, 1.75) {$\veca$};
+		\node [style=none] (27) at (2.5, 4.75) {$\vecb$};
+		\node [style=none] (28) at (1, 6.25) {$s$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw (0.center)
+			 to (2.center)
+			 to (1.center)
+			 to cycle;
+		\draw (9.center) to (5.center);
+		\draw (8.center) to (6.center);
+		\draw (18.center) to (20.center);
+		\draw (15) to (24.center);
+		\draw (4.center) to (13);
+		\draw [in=-90, out=90, looseness=1.25] (23.center) to (14);
+		\draw [in=-90, out=90, looseness=1.75] (14) to (21.center);
+	\end{pgfonlayer}
+\end{tikzpicture}

@@ -1,0 +1,12 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=unitary] (0) at (0, 0) {$\Phi$};
+		\node [style=none] (3) at (0, -2) {};
+		\node [style=none] (7) at (0, 1.75) {};
+		\node [style=none] (8) at (-2, 0) {$k$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw (3.center) to (0);
+		\draw (7.center) to (0);
+	\end{pgfonlayer}
+\end{tikzpicture}

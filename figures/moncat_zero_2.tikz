@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=unitary] (0) at (0, 0) {$0$};
+		\node [style=none] (3) at (0, -2) {};
+		\node [style=none] (7) at (0, 1.75) {};
+		\node [style=unitary] (8) at (1.75, 0) {$f$};
+		\node [style=none] (9) at (1.75, -2) {};
+		\node [style=none] (10) at (1.75, 1.75) {};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw (3.center) to (0);
+		\draw (7.center) to (0);
+		\draw (9.center) to (8);
+		\draw (10.center) to (8);
+	\end{pgfonlayer}
+\end{tikzpicture}

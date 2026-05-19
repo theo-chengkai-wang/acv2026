@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=unitary] (17) at (-1, -1) {$f_i$};
+		\node [style=unitary] (18) at (1, -1) {g};
+		\node [style=unitary] (19) at (0, 1) {$h$};
+		\node [style=none] (20) at (-1, -3) {};
+		\node [style=none] (21) at (1, -3) {};
+		\node [style=none] (22) at (-0.5, 0.5) {};
+		\node [style=none] (23) at (0.5, 0.5) {};
+		\node [style=none] (24) at (0, 2.5) {};
+		\node [style=none] (25) at (-3, -1) {$\sum_{i=0, 1}$};
+		\node [style=none] (26) at (-4.5, 0) {};
+		\node [style=none] (27) at (0, 0) {};
+		\node [style=none] (28) at (0, -2) {};
+		\node [style=none] (29) at (-4.5, -2) {};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw (20.center) to (17);
+		\draw [in=-90, out=90, looseness=1.50] (17) to (22.center);
+		\draw (21.center) to (18);
+		\draw [in=-90, out=90, looseness=1.50] (18) to (23.center);
+		\draw (19) to (24.center);
+		\draw [style=gray dotted] (26.center) to (27.center);
+		\draw [style=gray dotted] (27.center) to (28.center);
+		\draw [style=gray dotted] (28.center) to (29.center);
+		\draw [style=gray dotted] (29.center) to (26.center);
+	\end{pgfonlayer}
+\end{tikzpicture}

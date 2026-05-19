@@ -1,0 +1,39 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=none] (0) at (-2, 0) {};
+		\node [style=none] (1) at (0, -1.5) {};
+		\node [style=none] (2) at (2, 0) {};
+		\node [style=none] (3) at (0, -0.5) {$\rho$};
+		\node [style=none] (5) at (1, 0) {};
+		\node [style=none] (6) at (1.75, 0) {};
+		\node [style=none] (7) at (1.75, 2) {};
+		\node [style=none] (8) at (1, 2) {};
+		\node [style=none] (9) at (1, 2.5) {$\mathbf{in}$};
+		\node [style=none] (10) at (1.75, 2.5) {$h$};
+		\node [style=none] (14) at (-0.5, 0) {};
+		\node [style=none] (15) at (-1.75, 0) {};
+		\node [style=none] (18) at (-0.5, 2) {};
+		\node [style=none] (23) at (-3, 0.5) {$a$};
+		\node [style=none] (24) at (-0.5, 2.5) {$b$};
+		\node [style=rect small] (25) at (-0.5, 1.25) {$U$};
+		\node [style=none] (26) at (-2.75, 1.5) {};
+		\node [style=none] (27) at (-1.25, 1.5) {};
+		\node [style=none] (28) at (-2, 0.25) {};
+		\node [style=none] (29) at (-2, 1) {$0$};
+		\node [style=none] (30) at (-2, 1.5) {};
+		\node [style=none] (31) at (-2, 2) {};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw (0.center) to (2.center);
+		\draw (2.center) to (1.center);
+		\draw (1.center) to (0.center);
+		\draw (8.center) to (5.center);
+		\draw (7.center) to (6.center);
+		\draw (14.center) to (25);
+		\draw (18.center) to (25);
+		\draw (27.center) to (26.center);
+		\draw (26.center) to (28.center);
+		\draw (28.center) to (27.center);
+		\draw (31.center) to (30.center);
+	\end{pgfonlayer}
+\end{tikzpicture}

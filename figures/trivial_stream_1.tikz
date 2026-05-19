@@ -1,0 +1,20 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=none] (0) at (2, -1.25) {};
+		\node [style=none] (1) at (2, 1) {};
+		\node [style=none] (2) at (-1.75, -2.25) {};
+		\node [style=none] (3) at (4, 1) {};
+		\node [style=none] (4) at (-2, 1) {};
+		\node [style=none] (5) at (-4, 1) {};
+		\node [style=none] (6) at (-4, 1.5) {$\mathbf{in}$};
+		\node [style=none] (7) at (-2, 2.25) {$\mathbf{in}$ handle};
+		\node [style=none] (8) at (4, 2.25) {$\Aux(\sigma + \opin)$};
+		\node [style=none] (9) at (-1.75, -3) {$\mathbf{in}$ which has just been used};
+		\node [style=none] (10) at (2, -2) {$\Aux(\sigma)$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw (1.center) to (0.center);
+		\draw [in=-90, out=90, looseness=1.50] (2.center) to (3.center);
+		\draw [bend right=90, looseness=3.00] (5.center) to (4.center);
+	\end{pgfonlayer}
+\end{tikzpicture}

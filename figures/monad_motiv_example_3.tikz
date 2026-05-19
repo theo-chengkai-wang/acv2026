@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+	\begin{pgfonlayer}{nodelayer}
+		\node [style=none] (4) at (3.5, -1) {};
+		\node [style=none] (5) at (4.75, -1) {};
+		\node [style=none] (6) at (6.25, -1) {};
+		\node [style=none] (7) at (3.5, 1.5) {};
+		\node [style=none] (8) at (6.25, 0) {};
+		\node [style=none] (9) at (4, 1.5) {};
+		\node [style=rect small] (14) at (6.5, 0.5) {$T(\sigma,  \opin)$};
+		\node [style=none] (15) at (6, 0.5) {};
+		\node [style=none] (16) at (6, 1.5) {};
+		\node [style=none] (17) at (6.5, 0.5) {};
+		\node [style=none] (18) at (6.5, 1.5) {};
+		\node [style=none] (30) at (4.75, -1.75) {$\opin$};
+	\end{pgfonlayer}
+	\begin{pgfonlayer}{edgelayer}
+		\draw [in=90, out=-90] (7.center) to (4.center);
+		\draw [in=90, out=-90, looseness=2.25] (9.center) to (5.center);
+		\draw (8.center) to (6.center);
+		\draw (16.center) to (15.center);
+		\draw (17.center) to (18.center);
+	\end{pgfonlayer}
+\end{tikzpicture}

@@ -53,9 +53,9 @@ The end goal would be to develop an axiomatisation of program equivalence betwee
     \node (A) at (0, 1.2) {{\bfseries Algebraic theory} $\iotq$};
     \node (B) at (-3.4, -1.2) {{\bfseries Operational semantics} \\ quantum streams};
     \node (C) at (3.4, -1.2) {{\bfseries Denotational semantics} \\ free I/O monad on $\CPinf$};
-    \draw[->] (A) -- node[midway, above left, font=\scriptsize] {sound} (B);
-    \draw[->] (A) -- node[midway, above right, font=\scriptsize] {sound} (C);
-    \draw[<->] (B) -- node[midway, below, font=\scriptsize] {adequacy \\ + full abstraction} (C);
+    \draw[->] (A) -- node[midway, above left, font=\scriptsize] {\cref{thm:soundopsem}} (B);
+    \draw[->] (A) -- node[midway, above right, font=\scriptsize] {\cref{thm:sounddensem}} (C);
+    \draw[<->] (B) -- node[midway, below, font=\scriptsize] {\cref{thm:adeqfullabs}} (C);
   \end{tikzpicture}
   \caption{Three semantics of quantum communication and how they relate.}
   \label{fig:triangle}
@@ -89,23 +89,37 @@ $$\opmeasure(a,\; \opout(b, x),\; \opout(b, y)) = \opout(b,\; \opmeasure(a, x, y
 is required to derive the equivalence between: preparing a Bell pair, sending one end and discarding the other end; and tossing a fair coin and sending the outcome as a qubit. 
 
 \subsection{An Operational Model}
-The notion of communication that our theory soundly axiomatises can be demonstrated through an operational model. Let $\CP$ be the category of finite dimensional C* algebras and complete positive maps, constructed as in \cite{selinger_dagger_compact_closed_cat_cp_maps}. 
+The notion of communication that our theory soundly axiomatises can be demonstrated through an operational model. We work in, $\CP$ the category of finite dimensional C* algebras and complete positive maps, constructed as in \cite{selinger_dagger_compact_closed_cat_cp_maps}. 
 
 The operational semantics is based on a \emph{quantum stream}, specifying the environment our program communicates with. The idea is then to have a global quantum state $\rho: \complex \to S \otimes \qbit \otimes H$, where $S$ is the program state, $H$ is the hidden stream state, and $\qbit$ is the next input qubit. Then, a stream is a state machine reacting to the program's communications: formally, a stream is specified by a hidden state type $H_\sigma$ and transition maps $T_{\opin}(\sigma)$, $T_{\opout}(\sigma)$ for every communication trace $\sigma \in \traceset$. 
 
-We can then build an operational semantics with configuration $\config{\rho}{\sigma}{c}$, where $\rho$ is the global state, $\sigma \in \{\opin, \opout\}^*$, $c$ is the program. Given a stream specification $t$ we can give a small step transition relation $\to^t_p$ defined inductively on the program. For example for the output operation we can have:
-
-\todo{}
-
-where the output is performed, and the stream state is updated according to $t$. It is then not difficult to extend $\quequiv$ to communicating quantum programs, to obtain a sound model of $\iotq$: 
+We can then build an operational semantics with configuration $\config{\rho}{\sigma}{c}$, where $\rho$ is the global state, $\sigma \in \{\opin, \opout\}^*$, $c$ is the program. Given a stream specification $t$ we can give a small step transition relation $\to^t_p$ defined inductively on the program. For example for the output operation, the rule is as in \cref{fig:opsemout}: the output is performed, and the stream state is updated according to $t$. It is then not difficult to extend $\quequiv$ to communicating quantum programs, to obtain a sound model of $\iotq$: 
 \begin{theorem}
+  \label{thm:soundopsem}
   $\typing{\Gamma}{\Delta}{c=c'} \implies \typing{\Gamma}{\Delta}{c \quequiv c'}$.
 \end{theorem}
+\begin{figure}
+  \begin{equation}
+  \config{\tikzfig{meas_out_init}}{\sigma}{\opout(q, c)} \to_1 \config{\tikzfig{out_post}}{\sigma + \opout}{c} \tag{\text{out}}
+\end{equation}
+\caption{Operational Rule for $\opout$}
+\label{fig:opsemout}
+\end{figure}
 
 \subsection{A Denotational Model}
 \paragraph{Strategy}
+
 \paragraph{The Quantum I/O Monad}
 \paragraph{Denotational Semantics}
+
+\begin{theorem}
+  \label{thm:adeqfullabs}
+  $\typing{\Gamma}{\Delta}{c \quequiv c'} \iff \sem{c} = \sem{c'}$.
+\end{theorem}
+\begin{corollary}
+  \label{thm:sounddensem}
+  $\typing{\Gamma}{\Delta}{c=c'} \implies \sem{c} = \sem{c'}$.
+\end{corollary}
 
 \section{Limitations and Future Work}
 
