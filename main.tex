@@ -22,10 +22,10 @@
 
 \begin{document}
 
-\title{Semantics and Equational Axiomatisation for Quantum Communication}
+\title{Semantics and Equational Axiomatisation of Quantum Communication}
 
 \author{Theo Wang}
-\authornote{This presentation is based on joint work with Sam Staton (Oxford)~\cite{wang_algebraic_2024}, presented for the first time at PLanQC 2025. }
+\authornote{This presentation is based on joint work with Sam Staton (Oxford)~\cite{wang_algebraic_2024}, presented for the first time at PLanQC 2025.}
 \email{theo.wang@spc.ox.ac.uk}
 \affiliation{%
   \institution{University of Oxford}
@@ -41,44 +41,44 @@
   p: qbit = in(); q: qbit = new(|0>); 
   if (measure(p) == |1>) { out(q); }
 \end{lstlisting}
-The goal is to develop an axiomatisation of program equivalence between communicating quantum programs. 
+The goal is to develop an axiomatisation of program equivalence between communicating quantum programs.
 
-\paragraph{Why.} Quantum communication is an important programming primitive in distributed quantum computing~\cite{DQC_survey_Caleffi_2024}. Textbook quantum protocols such as teleportation \cite{Teleportation_PhysRevLett.70.1895} and BB84 \cite{BB84_BENNETT20147} already implicitly use communication primitives. Prior work already treats quantum communication within quantum process calculi~\cite{qCCS_ying2010algebraquantumprocesses,CQP_gay2004communicatingquantumprocesses,QPAlg_lalire2004processalgebraicapproachconcurrent, lqCCS_10.1145/3632885}, where communication is entangled with the additional complexity of concurrency.
+\paragraph{Why.} The broader research programme is to develop operationally and denotationally sound verification tools for distributed quantum programming~\cite{DQC_survey_Caleffi_2024}. Prior work focuses on quantum process calculi (QPCs)~\cite{qCCS_ying2010algebraquantumprocesses,CQP_gay2004communicatingquantumprocesses,QPAlg_lalire2004processalgebraicapproachconcurrent, lqCCS_10.1145/3632885}, which give a natural bisimulation-based verification technique for quantum protocols. QPCs are expressive (parallelism + communication + quantum effects) but complex and fundamentally operational. They lack a clear denotational reading compatible with quantum theory. Our strategy is to isolate quantum communication from concurrency, recovering a denotational reading alongside the operational one. Verification then happens through an equational axiomatisation.
 
-\paragraph{How.} We study the individual operations of quantum communication \emph{in isolation}, as algebraic effects, following the tradition of Plotkin and Power~\cite{plotkin_power_2002}. We do so following the triangle summarised by \cref{fig:triangle}. We propose a new algebraic theory for quantum communication building on \cite{statonpopl15}, and study an operational and a denotational model of the theory. Finally, we show that denotational and operational equalities coincide.  
+\paragraph{How.} Concretely, we model communication operations as algebraic effects, following the tradition of Plotkin and Power~\cite{plotkin_power_2002}, as summarised by \cref{fig:triangle}. We propose a new algebraic theory for quantum communication building on \cite{statonpopl15} and study an operational and a denotational model of the theory. Finally we show the two models are equivalent.
 
 \begin{figure}[ht]
   \centering
   \begin{tikzpicture}[scale=0.7, every node/.style={align=center, font=\footnotesize}]
     \node (A) at (0, 1.2) {{\bfseries Algebraic theory} $\iotq$};
     \node (B) at (-3.4, -1.2) {{\bfseries Operational semantics} \\ quantum streams};
-    \node (C) at (3.4, -1.2) {{\bfseries Denotational semantics} \\ free I/O monad on $\CPinf$};
+    \node (C) at (3.4, -1.2) {{\bfseries Denotational semantics} \\ I/O monad on $\CPinf$};
     \draw[->] (A) -- node[midway, above left, font=\scriptsize] {\Cref{thm:soundopsem}} (B);
     \draw[->] (A) -- node[midway, above right, font=\scriptsize] {\Cref{thm:sounddensem}} (C);
     \draw[<->] (B) -- node[midway, below, font=\scriptsize] {\Cref{thm:adeqfullabs}} (C);
   \end{tikzpicture}
-  \caption{Three semantics of quantum communication and how they relate.}
+  \caption{Three semantics of quantum communication.}
   \label{fig:triangle}
 \end{figure}
 
 \section{Background: Axiomatising Quantum Computing}
 We already know how to build the same triangle for qubit quantum computing without communication. Our starting point is \cite{statonpopl15}'s axiomatisation for qubit quantum computing, $\quantum$, based on \textit{parameterised} algebraic theories (PAT). PATs are a generic framework for axiomatising the behaviour of computations depending on certain resources in terms of operations and equations. Here, resources will correspond to qubits.
 
-\paragraph{Operations} $\op: \arity{p}{m_1...m_k}$ represent computations which take $p$ qubits, classically choose one of the $k$ branches, say, $i$, and return $m_i$ qubits. $\quantum$ has three operations: state preparation $\new: (0 \mid 1)$, unitary evolution $\applyU: (n \mid n)$ for each $2^n \times 2^n$ unitary $U$, and classical control $\opmeasure: (1 \mid 0, 0)$.
+\paragraph{Operations} $\op: \arity{p}{m_1...m_k}$ represent computations which take $p$ qubits, classically choose one of the $k$ branches, say, $i$, and return $m_i$ qubits. $\quantum$ has three operations: state preparation $\new: (0 \mid 1)$, unitary evolution $\applyU: (n \mid n)$ for each $2^n \times 2^n$ unitary $U$, and computational basis measurement \& classical control $\opmeasure: (1 \mid 0, 0)$.
 
-\paragraph{Terms} generated from the operations, follow the same intuition: a term $\typing{x_1: m_1...x_k: m_k}{q_1...q_p}{c}$ takes $p$ input qubits $q_1...q_p$ and calls one of the $k$ continuations $x_1...x_k$ with the corresponding number of qubits. We can thus write for example the program 
+\paragraph{Terms} generated from the operations follow the same intuition: a term $\typing{x_1: m_1...x_k: m_k}{q_1...q_p}{c}$ takes $p$ input qubits $q_1...q_p$ and calls one of the $k$ continuations $x_1...x_k$ with the corresponding number of qubits. We can thus write for example the program 
   \[
   \typing{x: 1, y: 1}{q_1, q_2}{\opmeasure(q_1, x(q_2), y(q_2))}
   \]
-  which measures a $q_1$ and continues with $x$ or $y$ with $q_2$ based on the measurement outcome. 
+  which measures $q_1$ and continues with $x$ or $y$ with $q_2$ based on the measurement outcome. 
 \paragraph{Equations} are given in the form $\typing{\Gamma}{\Delta}{c=c'}$. $\quantum$ for example specifies the effect of measuring a $\ket|0>$ qubit using the following equation:
 \[
 \typing{x: 0, y: 0}{\cdot}{\new(q. \opmeasure(q, x, y)) = x}
 \]
 
-\paragraph{Models: Denotational and Operational} \cite{statonpopl15} proceeds to define a denotational model for the $\quantum$ theory, where each term $\typing{x_1:m_1...x_k:m_k}{q_1...q_p}{c}$ is interpreted as a complete positive unital (CPU) map $$\sem{c}: \bigoplus_{i=1}^k\Mat_{2^{m_i}}(\complex) \to \Mat_{2^p}(\complex).$$ Remarkably, this model is \emph{fully complete}: every CPU map of this type is the interpretation of some term $c$, and two CPU maps are equal iff their term representation are derivably equal in the equational theory. 
+\paragraph{Models: Denotational and Operational} \cite{statonpopl15} proceeds to define a denotational model for the $\quantum$ theory, where each term $\typing{x_1:m_1...x_k:m_k}{q_1...q_p}{c}$ is interpreted as a complete positive unital (CPU) map $$\sem{c}: \bigoplus_{i=1}^k\Mat_{2^{m_i}}(\complex) \to \Mat_{2^p}(\complex).$$ Remarkably, this model is \emph{fully complete}: every CPU map of this type is the interpretation of some term $c$, and two CPU maps are equal iff their term representations are derivably equal in the equational theory. 
 
-We can in fact give an equivalent operational model for $\quantum$. Briefly, configurations are of the form $\langle \rho, c \rangle$ where $\rho$ is the program state, $c$ the running program, and transitions $\to_p$ are probabilistic. We can then formulate in terms of $\to_p$ an operational notion of program equivalence $\quequiv$ equivalent with denotational equality. 
+We can also give an equivalent operational model for $\quantum$. Briefly, configurations are of the form $\langle \rho, c \rangle$ where $\rho$ is the program state, $c$ the running program, and transitions $\to_p$ are probabilistic. We can then formulate in terms of $\to_p$ an operational notion of program equivalence $\quequiv$ equivalent to denotational equality. 
 
 \section{Semantics for Quantum Communication}
 We proceed to extend our language with communication primitives, and strive to recover the same triangle. 
@@ -89,29 +89,29 @@ $$\opmeasure(a,\; \opout(b, x),\; \opout(b, y)) = \opout(b,\; \opmeasure(a, x, y
 is required to derive the equivalence between: preparing a Bell pair, sending one qubit and discarding the other; and tossing a fair coin and sending the outcome as a qubit. 
 
 \subsection{An Operational Model}
-The notion of communication that our theory soundly axiomatises can be demonstrated through an operational model. We work in $\CP$, the category of finite dimensional C* algebras and complete positive maps, constructed as in \cite{selinger_dagger_compact_closed_cat_cp_maps}. 
+Concretely, the notion of communication that our theory soundly axiomatises can be demonstrated through an operational model. We work in $\CP$, the category of finite dimensional C* algebras and complete positive maps, constructed as in \cite{selinger_dagger_compact_closed_cat_cp_maps}. 
 
-The operational semantics is based on a \emph{quantum stream}, specifying the environment our program communicates with. The idea is then to have a global quantum state $\rho: \complex \to S \otimes \qbit \otimes H$, where $S$ is the program state, $H$ is the hidden stream state, and $\qbit$ is the next input qubit. Then, a stream is a state machine reacting to the program's communications: formally, a stream is specified by a hidden state type $H_\sigma$ and transition maps $T_{\opin}(\sigma)$, $T_{\opout}(\sigma)$ for every communication trace $\sigma \in \traceset$. 
+The operational semantics is based on a \emph{quantum stream}, specifying the environment our program communicates with. The idea is to have a global quantum state $\rho: \complex \to S \otimes \qbit \otimes H$, where $S$ is the program state, $H$ is the hidden stream state, and $\qbit$ holds the next input qubit. Then, a stream is a state machine reacting to the program's communications: formally, a stream $t$ is specified by a hidden state type $H_\sigma$ and transition maps $T_{\opin}(\sigma)$, $T_{\opout}(\sigma)$ for every communication trace $\sigma \in \traceset$. 
 
-We can then build an operational semantics with configuration $\config{\rho}{\sigma}{c}$, where $\rho$ is the global state, $\sigma \in \{\opin, \opout\}^*$, $c$ is the program. Given a stream specification $t$ we can give a small step transition relation $\to^t_p$ defined inductively on the program. For example for the output operation, the rule is as in \cref{fig:opsemout}: the output is performed, and the stream state is updated according to $t$. Finally, $\quequiv$ extends naturally to communicating quantum programs, thus specifying a sound model of $\iotq$. 
+We can then build an operational semantics with configuration $\config{\rho}{\sigma}{c}$, where $\rho$ is the global state, $\sigma \in \traceset$ is the communication trace, and $c$ is the program. Given a stream specification $t$, we can give a small-step transition relation $\to^t_p$ defined inductively on the program. For example, for the output operation, the rule is as in \cref{fig:opsemout}: the output is performed, and the stream state is updated according to $t$. Finally, $\quequiv$ extends naturally to communicating quantum programs and gives a sound model of $\iotq$. 
 \begin{theorem}
   \label{thm:soundopsem}
   $\typing{\Gamma}{\Delta}{c=c'} \implies \typing{\Gamma}{\Delta}{c \quequiv c'}$.
 \end{theorem}
 \begin{figure}
   \[
-  \config{\tikzfig{meas_out_init}}{\sigma}{\opout(q, c)} \to_1 \config{\tikzfig{out_post}}{\sigma + \opout}{c} 
+  \config{\tikzfig{meas_out_init}}{\sigma}{\opout(q, c)} \to_1^t \config{\tikzfig{out_post}}{\sigma + \opout}{c} 
   \]
-\caption{Operational Rule for $\opout$}
+\caption{Operational rule for $\opout$}
 \label{fig:opsemout}
 \end{figure}
 
 \subsection{A Denotational Model}
-\paragraph{The Quantum I/O Monad} In the tradition of algebraic effects \cite{plotkin_power_2002,sums_tensors_HYLAND200670}, we build an I/O monad ($T(X) = \mu Y. [\qbitin, Y] \oplus \qbitout \otimes Y \oplus X$, where we annotate $\qbit$ for bookkeeping reasons) directly on top of $\CP$. On the one hand, we can simplify the definition of $T$ by unrolling the fixed point and by noting that $[\qbitin, Y] \cong \qbitin \otimes Y$ by compact closure and self-duality: 
+\paragraph{The Quantum I/O Monad} In the tradition of algebraic effects \cite{plotkin_power_2002,sums_tensors_HYLAND200670}, we build an I/O monad ($T(X) = \mu Y. [\qbitin, Y] \oplus \qbitout \otimes Y \oplus X$, where the $\opin$ and $\opout$ superscripts are bookkeeping) directly on top of $\CP$. On the one hand, we can simplify the definition of $T$ by unrolling the fixed point and by noting that $[\qbitin, Y] \cong \qbitin \otimes Y$ by compact closure and self-duality: 
 \[
 T (X) = \bigoplus_{\sigma \in \traceset} (\qbit^{\sigma} \otimes X) 
 \]
-where $\qbit^{\opin, \opout, ...} = \qbitin \otimes \qbitout \otimes ...$. On the other hand, $T$ is not well-defined because $\CP$ only has finite biproducts. To make it well-defined, we follow \cite{PaganiSV13} and complete $\CP$ with infinite biproducts using a dcpo completion, obtaining $\CPinf$. Now $T$ is well-defined as a functor $\CPinf \to \CPinf$, which is in fact a monad. 
+where $\qbit^{s_1...s_n} = \qbit^{s_1} \otimes \dots \otimes \qbit^{s_n}$, $s_i \in \{\opin, \opout\}$. On the other hand, $T$ is not well-defined because $\CP$ only has finite biproducts. To make it well-defined, we follow \cite{PaganiSV13} and complete $\CP$ with infinite biproducts using a dcpo completion, obtaining $\CPinf$. Now $T$ is well-defined as a functor $\CPinf \to \CPinf$, which is in fact a monad. 
 
 % This definition makes intuitive sense: the I/O trace of a computation determines exactly how many input qubits it will depend on, and how many output qubits it will generate. 
 
@@ -119,7 +119,7 @@ where $\qbit^{\opin, \opout, ...} = \qbitin \otimes \qbitout \otimes ...$. On th
 \[
    \sem{\opin} \eqdef \inj^{\opin} \circ \left[\tikzfig{monadic_sem_in}\right] 
 \]
-where the `cup' is the unnormalised Bell state. Intuitively, $\sem{\opin}$ is supposed to take a new input; the cup bends the input wire up so it appears on the output side, as specified by the monad. It turns out this denotation corresponds exactly to the operational notion of equality, $\quequiv$. We thus get: 
+where the `cup' is the unnormalised Bell state. Intuitively, $\sem{\opin}$ is supposed to take a new input; the cup bends the input wire up so it appears on the output side, as specified by the monad. Remarkably, this denotation corresponds exactly to the operational notion of equality, $\quequiv$. We thus get: 
 \begin{theorem}
   \label{thm:adeqfullabs}
   $\typing{\Gamma}{\Delta}{c \quequiv c'} \iff \sem{c} = \sem{c'}$.
@@ -131,7 +131,7 @@ where the `cup' is the unnormalised Bell state. Intuitively, $\sem{\opin}$ is su
 
 \section{Limitations and Future Work}
 
-We have obtained a sound axiomatisation $\iotq$ for one notion of quantum communication, presented in two equivalent ways: operationally and denotationally. However, unlike the quantum computing case, we do not have completeness -- whether $\sem{c}=\sem{c'} \implies c = c'$ is open. Achieving this is our immediate next step. It would equally be interesting to relate this work to quantum process calculi, higher order quantum computing \cite{PaganiSV13,kissinger2019categorical}, and their applications in verifying quantum protocols (e.g.~\cite{lqCCS_10.1145/3632885}).
+We have obtained a sound axiomatisation $\iotq$ for one notion of quantum communication, presented in two equivalent ways: operationally and denotationally -- a first step towards equational verification of quantum protocols. However, unlike the quantum computing case, we do not have completeness -- whether $\sem{c}=\sem{c'} \implies \typingfilled{c = c'}$ is open. Achieving this is our immediate next step. Beyond that, we are interested in connecting this work back to quantum process calculi (e.g.~\cite{lqCCS_10.1145/3632885}) and higher-order quantum computing \cite{PaganiSV13,kissinger2019categorical}. 
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
